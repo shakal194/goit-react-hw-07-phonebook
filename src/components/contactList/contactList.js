@@ -1,25 +1,38 @@
-import actions from 'components/redux/actions';
-import { getFilteredContacts } from 'components/redux/selectors';
+import { Circles } from 'react-loader-spinner';
 
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { ContactItem } from './contactItem';
 import s from './contactList.module.css';
 
-const ContactList = () => {
-  const dispatch = useDispatch();
-  const filteredContacts = useSelector(getFilteredContacts);
+const ContactList = ({ contacts: { data: contacts, isFetching, isError } }) => {
+  const filterValue = useSelector(state => state.filter);
+
   return (
-    <ul className={s.list}>
-      {filteredContacts.map(({ id, name, number }) => {
-        return (
-          <ContactItem
-            contact={{ id, name, number }}
-            key={id}
-            onDelete={id => dispatch(actions.contactDelete(id))}
+    <>
+      {isFetching && (
+        <div className={s.watch}>
+          <Circles
+            color="#00BFFF"
+            height={200}
+            width={200}
+            ariaLabel="loading"
           />
-        );
-      })}
-    </ul>
+        </div>
+      )}
+      {!isFetching && !isError && contacts && (
+        <ul className={s.list}>
+          {contacts
+            .filter(({ name }) =>
+              name.toLowerCase().includes(filterValue.toLowerCase())
+            )
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map(({ id, name, phone }) => {
+              return <ContactItem contact={{ id, name, phone }} key={id} />;
+            })}
+        </ul>
+      )}
+      {isError && <h1>Data are not found</h1>}
+    </>
   );
 };
 

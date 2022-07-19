@@ -1,3 +1,4 @@
+import { useFetchContactsQuery } from '../redux/api-service';
 import ContactForm from '../contactForm';
 import ContactList from '../contactList';
 import FilterContact from '../filter/filter';
@@ -5,13 +6,15 @@ import FilterContact from '../filter/filter';
 import { Container, MainTitle, Title } from './App.styled';
 
 function App() {
+  const fetchContacts = useFetchContactsQuery();
+
   return (
     <Container>
       <MainTitle>Phone Book</MainTitle>
-      <ContactForm />
+      <ContactForm contacts={fetchContacts} />
       <Title>Contacts</Title>
       <FilterContact title="Find contact by name" />
-      <ContactList />
+      <ContactList contacts={fetchContacts} />
     </Container>
   );
 }

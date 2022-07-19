@@ -31,3 +31,8 @@
 .button:focus {
   cursor: pointer;
 }
+
+.watch {
+  display: flex;
+  justify-content: center;
+}

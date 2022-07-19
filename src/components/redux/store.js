@@ -1,40 +1,18 @@
-import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import {
-  persistStore,
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
-import reducer from './reducer';
+import { configureStore } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/dist/query';
+import { contactsApi } from 'components/redux/api-service';
+import { filter } from './Filter/reducer';
 
-const persistConfig = {
-  key: 'phone-book',
-  storage,
-  blacklist: ['filter'],
-};
-
-const middleware = [
-  ...getDefaultMiddleware({
-    serializableCheck: {
-      ignoreActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-    },
-  }),
-];
-
-const store = configureStore({
+export const store = configureStore({
   reducer: {
-    contacts: persistReducer(persistConfig, reducer),
+    [contactsApi.reducerPath]: contactsApi.reducer,
+    filter: filter,
   },
-  middleware,
+  middleware: getDefaultMiddleware => [
+    ...getDefaultMiddleware(),
+    contactsApi.middleware,
+  ],
   devTools: process.env.NODE_ENV === 'development',
 });
 
-const persistor = persistStore(store);
-
-// eslint-disable-next-line import/no-anonymous-default-export
-export default { store, persistor };
+setupListeners(store.dispatch);
